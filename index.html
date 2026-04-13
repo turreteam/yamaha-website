@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雅马哈导航栏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            background-color: #ff0000;
+            padding: 0 30px;
+            height: 60px;
+            position: relative;
+        }
+
+        .nav-left {
+            display: flex;
+            gap: 30px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 20px;
+            position: absolute;
+            right: 30px;
+        }
+
+        .nav-left a, .nav-right a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 18px 0;
+            transition: color 0.3s;
+        }
+
+        .nav-left a:hover, .nav-right a:hover {
+            color: #ffd700;
+        }
+
+        /* 产品下拉菜单 - 移至轮播图顶部 */
+        .dropdown {
+            position: relative;
+            height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown > a {
+            padding: 18px 0;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .dropdown:hover .dropdown-content,
+        .dropdown.active .dropdown-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .dropdown-content > a, .dropdown-content > .sub-dropdown > a {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            font-size: 14px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s;
+            flex: 1 0 150px;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content a:hover {
+            background: #f5f5f5;
+            color: #e05adc;
+        }
+
+        /* 电子键盘子下拉菜单 */
+        .sub-dropdown {
+            position: relative;
+        }
+
+        .sub-dropdown > a::after {
+            content: " ▼";
+            font-size: 10px;
+        }
+
+        .sub-dropdown-content {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 1001;
+        }
+
+        .sub-dropdown:hover .sub-dropdown-content,
+        .sub-dropdown.active .sub-dropdown-content {
+            display: block;
+        }
+
+        .sub-dropdown-content a {
+            display: block;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sub-dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .logo {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 40px;
+        }
+
+        /* 轮播图样式 */
+        .carousel {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 500px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-slide:nth-child(1) { background: #ff6b6b; }
+        .carousel-slide:nth-child(2) { background: #4ecdc4; }
+        .carousel-slide:nth-child(3) { background: #45b7d1; }
+        .carousel-slide:nth-child(4) { background: #96ceb4; }
+        .carousel-slide:nth-child(5) { background: #dda0dd; }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .carousel-btn.prev { left: 20px; }
+        .carousel-btn.next { right: 20px; }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .carousel-dot.active {
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="#" class="logo">我是300斤马超</a>
+            <a href="#">首页</a>
+            <div class="dropdown">
+                <a href="#">产品</a>
+                <div class="dropdown-content">
+                    <a href="#">钢琴</a>
+                    <div class="sub-dropdown">
+                        <a href="#">电子键盘</a>
+                        <div class="sub-dropdown-content">
+                            <a href="#">吉他、贝斯和音箱</a>
+                            <a href="#">鼓乐器</a>
+                            <a href="#">管乐器·吹奏乐器</a>
+                            <a href="#">弦乐器</a>
+                            <a href="#">打击乐器</a>
+                            <a href="#">合成器及音乐制作产品</a>
+                            <a href="#">家庭音响</a>
+                            <a href="#">专业音响</a>
+                            <a href="#">会议系统</a>
+                        </div>
+                    </div>
+                    <a href="#">吉他、贝斯和音箱</a>
+                    <a href="#">鼓乐器</a>
+                    <a href="#">管乐器·吹奏乐器</a>
+                    <a href="#">弦乐器</a>
+                    <a href="#">打击乐器</a>
+                    <a href="#">合成器及音乐制作产品</a>
+                    <a href="#">家庭音响</a>
+                    <a href="#">专业音响</a>
+                    <a href="#">会议系统</a>
+                </div>
+            </div>
+            <a href="#">音乐服务</a>
+            <a href="#">新闻活动</a>
+        </div>
+        <div class="nav-right">
+            <a href="#">登录/注册</a>
+            <a href="#">关于雅马哈</a>
+        </div>
+    </nav>
+
+    <!-- 轮播图 -->
+    <div class="carousel">
+        <div class="carousel-track">
+            <div class="carousel-slide"></div>
+            <div class="carousel-slide"></div>
+            <div class="carousel-slide"></div>
+            <div class="carousel-slide"></div>
+            <div class="carousel-slide"></div>
+        </div>
+        <button type="button" class="carousel-btn prev">&lt;</button>
+        <button type="button" class="carousel-btn next">&gt;</button>
+        <div class="carousel-dots">
+            <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+        </div>
+    </div>
+
+    <script>
+        const track = document.querySelector('.carousel-track');
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.carousel-dot');
+        const prevBtn = document.querySelector('.carousel-btn.prev');
+        const nextBtn = document.querySelector('.carousel-btn.next');
+        let currentIndex = 0;
+
+        function goToSlide(index) {
+            if (index < 0) index = slides.length - 1;
+            if (index >= slides.length) index = 0;
+            currentIndex = index;
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+        }
+
+        prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+        nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+        dots.forEach((dot, i) => dot.addEventListener('click', () => goToSlide(i)));
+
+        // 自动播放
+        let autoPlay = setInterval(() => goToSlide(currentIndex + 1), 5000);
+
+        // 鼠标悬停暂停
+        const carousel = document.querySelector('.carousel');
+        carousel.addEventListener('mouseenter', () => clearInterval(autoPlay));
+        carousel.addEventListener('mouseleave', () => autoPlay = setInterval(() => goToSlide(currentIndex + 1), 5000));
+
+        // 产品下拉菜单点击切换
+        const dropdown = document.querySelector('.dropdown > a');
+        dropdown.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            document.querySelector('.dropdown').classList.toggle('active');
+        });
+
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', () => {
+            dropdown.classList.remove('active');
+            document.querySelectorAll('.sub-dropdown.active').forEach(el => el.classList.remove('active'));
+        });
+
+        // 子下拉菜单点击切换
+        const subDropdownLink = document.querySelector('.sub-dropdown > a');
+        subDropdownLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            document.querySelector('.sub-dropdown').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

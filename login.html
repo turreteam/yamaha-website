@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录/注册 - 雅马哈</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            display: flex;
+            align-items: center;
+            background-color: #ff0000;
+            padding: 0 30px;
+            height: 60px;
+            position: relative;
+        }
+
+        .nav-left {
+            display: flex;
+            gap: 30px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 20px;
+            position: absolute;
+            right: 30px;
+        }
+
+        .nav-left a, .nav-right a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 18px 0;
+            transition: color 0.3s;
+        }
+
+        .nav-left a:hover, .nav-right a:hover {
+            color: #ffd700;
+        }
+
+        .logo {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 40px;
+        }
+
+        /* 主容器 */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 60px);
+            padding: 40px 20px;
+        }
+
+        /* 登录注册卡片 */
+        .auth-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* 左侧品牌区 */
+        .auth-brand {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            flex: 1;
+            padding: 60px 40px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .auth-brand h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .auth-brand p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .auth-brand .brand-logo {
+            font-size: 48px;
+            margin-bottom: 30px;
+        }
+
+        /* 右侧表单区 */
+        .auth-form-container {
+            flex: 1;
+            padding: 60px 50px;
+        }
+
+        /* 标签切换 */
+        .auth-tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 40px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            color: #ff0000;
+            border-bottom-color: #ff0000;
+        }
+
+        .auth-tab:hover {
+            color: #ff0000;
+        }
+
+        /* 表单 */
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        /* 验证码 */
+        .captcha-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .captcha-group input {
+            flex: 1;
+        }
+
+        .captcha-code {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .captcha-code:hover {
+            background: #e0e0e0;
+        }
+
+        /* 协议 */
+        .agreement {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .agreement input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .agreement label {
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .agreement a {
+            color: #ff0000;
+            text-decoration: none;
+        }
+
+        .agreement a:hover {
+            text-decoration: underline;
+        }
+
+        /* 按钮 */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #cc0000;
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* 社交登录 */
+        .social-login {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .social-login p {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .social-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-btn.wechat { color: #07c160; }
+        .social-btn.qq { color: #12b7f5; }
+        .social-btn.weibo { color: #e6162d; }
+
+        /* 忘记密码 */
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #ff0000;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        /* 错误提示 */
+        .error-msg {
+            color: #ff0000;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group.error input {
+            border-color: #ff0000;
+        }
+
+        .form-group.error .error-msg {
+            display: block;
+        }
+
+        /* 成功提示 */
+        .success-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: white;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .success-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .success-popup .icon {
+            font-size: 60px;
+            color: #07c160;
+            margin-bottom: 20px;
+        }
+
+        .success-popup h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .success-popup p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 微信扫码登录 */
+        .wechat-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 40px;
+            min-width: 320px;
+        }
+
+        .wechat-modal.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .wechat-modal .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            transition: background 0.3s;
+        }
+
+        .wechat-modal .close-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .wechat-modal h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background: #f5f5f5;
+            margin: 0 auto 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-code img {
+            width: 180px;
+            height: 180px;
+        }
+
+        .qr-code .qr-loading,
+        .qr-code .qr-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 200px;
+            height: 200px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .qr-code .qr-error {
+            color: #ff4d4f;
+        }
+
+        .qr-code .qr-error small {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .qr-code .scan-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .qr-code .scan-overlay.show {
+            opacity: 1;
+        }
+
+        .qr-code .scan-overlay .icon {
+            font-size: 50px;
+            color: #07c160;
+            margin-bottom: 10px;
+        }
+
+        .qr-code .scan-overlay p {
+            font-size: 14px;
+            color: #07c160;
+        }
+
+        .qr-code .scan-overlay .confirm-btn {
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: #07c160;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .wechat-modal .tip {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .wechat-modal .tip strong {
+            color: #333;
+        }
+
+        /* 倒计时 */
+        .countdown {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .auth-card {
+                flex-direction: column;
+            }
+
+            .auth-brand {
+                padding: 40px 20px;
+            }
+
+            .auth-brand h1 {
+                font-size: 28px;
+            }
+
+            .auth-form-container {
+                padding: 40px 30px;
+            }
+
+            .nav-left {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">我是300斤马超</a>
+        <div class="nav-left">
+            <a href="index.html">首页</a>
+            <a href="#">产品</a>
+            <a href="#">音乐服务</a>
+            <a href="#">新闻活动</a>
+        </div>
+        <div class="nav-right">
+            <a href="login.html">登录/注册</a>
+            <a href="#">关于雅马哈</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="auth-card">
+            <!-- 左侧品牌区 -->
+            <div class="auth-brand">
+                <div class="brand-logo">🎵</div>
+                <h1>欢迎来到雅马哈</h1>
+                <p>探索音乐的无限可能<br>与我们一起创造美好旋律</p>
+            </div>
+
+            <!-- 右侧表单区 -->
+            <div class="auth-form-container">
+                <!-- 标签切换 -->
+                <div class="auth-tabs">
+                    <div class="auth-tab active" data-tab="login">登录</div>
+                    <div class="auth-tab" data-tab="register">注册</div>
+                </div>
+
+                <!-- 登录表单 -->
+                <form class="auth-form active" id="loginForm">
+                    <div class="forgot-password">
+                        <a href="#">忘记密码？</a>
+                    </div>
+                    <div class="form-group">
+                        <label>手机号 / 邮箱</label>
+                        <input type="text" name="username" placeholder="请输入手机号或邮箱" required>
+                        <div class="error-msg">请输入正确的手机号或邮箱</div>
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" name="password" placeholder="请输入密码" required>
+                        <div class="error-msg">密码不能为空</div>
+                    </div>
+                    <div class="form-group">
+                        <label>验证码</label>
+                        <div class="captcha-group">
+                            <input type="text" name="captcha" placeholder="请输入验证码" maxlength="4" required>
+                            <div class="captcha-code" id="captchaCode">1234</div>
+                        </div>
+                        <div class="error-msg">验证码错误</div>
+                    </div>
+                    <button type="submit" class="btn-submit">登录</button>
+
+                    <div class="social-login">
+                        <p>其他登录方式</p>
+                        <div class="social-btns">
+                            <button type="button" class="social-btn wechat" id="wechatBtn">微</button>
+                            <button type="button" class="social-btn qq" id="qqBtn">Q</button>
+                            <button type="button" class="social-btn weibo" id="weiboBtn">微</button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- 注册表单 -->
+                <form class="auth-form" id="registerForm">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" name="username" placeholder="请输入用户名" required>
+                        <div class="error-msg">用户名已存在</div>
+                    </div>
+                    <div class="form-group">
+                        <label>手机号</label>
+                        <input type="tel" name="phone" placeholder="请输入手机号" required>
+                        <div class="error-msg">请输入正确的手机号</div>
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" name="password" placeholder="请输入密码（8-20位）" required>
+                        <div class="hint">密码长度8-20位，必须包含字母和数字</div>
+                        <div class="error-msg">密码格式不符合要求</div>
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" name="confirmPassword" placeholder="请再次输入密码" required>
+                        <div class="error-msg">两次输入的密码不一致</div>
+                    </div>
+                    <div class="form-group">
+                        <label>验证码</label>
+                        <div class="captcha-group">
+                            <input type="text" name="captcha" placeholder="请输入验证码" maxlength="4" required>
+                            <div class="captcha-code" id="captchaCodeReg">5678</div>
+                        </div>
+                        <div class="error-msg">验证码错误</div>
+                    </div>
+                    <button type="submit" class="btn-submit">注册</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功弹窗 -->
+    <div class="overlay" id="overlay"></div>
+    <div class="success-popup" id="successPopup">
+        <div class="icon">✓</div>
+        <h3 id="popupTitle">登录成功</h3>
+        <p id="popupMessage">即将跳转到首页...</p>
+    </div>
+
+    <!-- 微信扫码弹窗 -->
+    <div class="wechat-modal" id="wechatModal">
+        <button type="button" class="close-btn close-modal">×</button>
+        <h3>微信登录</h3>
+        <div class="qr-code" id="wechatQrCode">
+            <div class="qr-loading">加载中...</div>
+        </div>
+                <p class="tip">请使用 <strong>微信小程序</strong> 扫描二维码登录</p>
+        <p class="countdown" id="wechatCountdown">二维码有效期：<span>--</span>秒</p>
+    </div>
+
+    <script>
+        // 标签切换
+        const tabs = document.querySelectorAll('.auth-tab');
+        const forms = document.querySelectorAll('.auth-form');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                forms.forEach(f => f.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + 'Form').classList.add('active');
+            });
+        });
+
+        // 生成随机验证码
+        function generateCaptcha() {
+            return Math.random().toString(36).substring(2, 6).toUpperCase();
+        }
+
+        const captchaCode = document.getElementById('captchaCode');
+        const captchaCodeReg = document.getElementById('captchaCodeReg');
+
+        captchaCode.textContent = generateCaptcha();
+        captchaCodeReg.textContent = generateCaptcha();
+
+        captchaCode.addEventListener('click', () => {
+            captchaCode.textContent = generateCaptcha();
+        });
+        captchaCodeReg.addEventListener('click', () => {
+            captchaCodeReg.textContent = generateCaptcha();
+        });
+
+        // 显示成功弹窗
+        function showSuccessPopup(title, message) {
+            document.getElementById('popupTitle').textContent = title;
+            document.getElementById('popupMessage').textContent = message;
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('successPopup').classList.add('show');
+        }
+
+        function hideSuccessPopup() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('successPopup').classList.remove('show');
+        }
+
+        document.getElementById('overlay').addEventListener('click', hideSuccessPopup);
+
+        // 登录表单提交
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = this.querySelector('[name="username"]').value;
+            const password = this.querySelector('[name="password"]').value;
+            const captcha = this.querySelector('[name="captcha"]').value;
+
+            // 简单验证
+            if (username && password && captcha.toUpperCase() === captchaCode.textContent) {
+                showSuccessPopup('登录成功', '即将跳转到首页...');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            } else if (captcha.toUpperCase() !== captchaCode.textContent) {
+                this.querySelector('[name="captcha"]').parentElement.parentElement.classList.add('error');
+            }
+        });
+
+        // 注册表单提交
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const captcha = this.querySelector('[name="captcha"]').value;
+
+            if (captcha.toUpperCase() !== captchaCodeReg.textContent) {
+                this.querySelector('[name="captcha"]').parentElement.parentElement.classList.add('error');
+                return;
+            }
+
+            showSuccessPopup('注册成功', '即将跳转到登录页面...');
+            setTimeout(() => {
+                tabs[0].click(); // 切换到登录标签
+                hideSuccessPopup();
+            }, 2000);
+        });
+
+        // 移除错误状态
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                this.parentElement.classList.remove('error');
+            });
+        });
+
+        // 扫码登录功能
+        const wechatBtn = document.getElementById('wechatBtn');
+        const wechatModal = document.getElementById('wechatModal');
+        let currentModal = null;
+        let pollTimer = null;
+        let countdownTimer = null;
+        let currentQrCode = null;
+
+        // 后端API地址（需要启动后端服务）
+        const API_BASE = 'http://localhost:3000/api';
+
+        async function openModal(modal) {
+            // 关闭其他弹窗
+            document.querySelectorAll('.wechat-modal').forEach(m => m.classList.remove('show'));
+            document.getElementById('overlay').classList.remove('show');
+
+            currentModal = modal;
+            modal.classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+
+            // 生成二维码
+            await generateQRCode();
+        }
+
+        async function generateQRCode() {
+            const qrContainer = document.getElementById('wechatQrCode');
+
+            qrContainer.innerHTML = '<div class="qr-loading">加载中...</div>';
+
+            try {
+                // 第一步：请求生成二维码
+                const generateResponse = await fetch(`${API_BASE}/auth/qrcode/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const generateData = await generateResponse.json();
+
+                if (!generateData.success) {
+                    qrContainer.innerHTML = '<div class="qr-error">生成失败</div>';
+                    return;
+                }
+
+                currentQrCode = generateData.code;
+
+                // 第二步：获取小程序码图片
+                const imageResponse = await fetch(`${API_BASE}/auth/qrcode/image?code=${generateData.code}`);
+                const imageData = await imageResponse.json();
+
+                if (imageData.success && imageData.image) {
+                    qrContainer.innerHTML = `<img src="${imageData.image}" alt="小程序码" class="qr-img">`;
+                    // 开始轮询
+                    startPolling(generateData.code, generateData.expiresAt);
+                } else {
+                    qrContainer.innerHTML = '<div class="qr-error">获取小程序码失败<br><small>请检查AppID配置</small></div>';
+                }
+            } catch (err) {
+                console.error('生成二维码失败:', err);
+                qrContainer.innerHTML = '<div class="qr-error">服务未启动<br><small>请启动后端服务</small></div>';
+            }
+        }
+
+        function startPolling(code, expiresAt) {
+            const expiresTime = new Date(expiresAt).getTime();
+            const countdownSpan = document.querySelector('#wechatCountdown span');
+
+            // 倒计时
+            let countdownSeconds = Math.floor((expiresTime - Date.now()) / 1000);
+            countdownSpan.textContent = countdownSeconds;
+
+            countdownTimer = setInterval(() => {
+                countdownSeconds--;
+                countdownSpan.textContent = countdownSeconds;
+                if (countdownSeconds <= 0) {
+                    // 二维码过期，重新生成
+                    generateQRCode();
+                }
+            }, 1000);
+
+            // 轮询状态
+            pollTimer = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/auth/qrcode/${code}/poll`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        switch (data.status) {
+                            case 'confirmed':
+                                // 登录成功
+                                clearInterval(pollTimer);
+                                clearInterval(countdownTimer);
+                                // 保存用户信息到 localStorage
+                                localStorage.setItem('token', data.token);
+                                localStorage.setItem('user', JSON.stringify(data.user));
+                                closeModal();
+                                showSuccessPopup('登录成功', '即将跳转到首页...');
+                                setTimeout(() => {
+                                    window.location.href = 'index.html';
+                                }, 2000);
+                                break;
+                            case 'expired':
+                                clearInterval(pollTimer);
+                                clearInterval(countdownTimer);
+                                showSuccessPopup('二维码已过期', '请重新扫码...');
+                                setTimeout(() => {
+                                    generateQRCode();
+                                }, 2000);
+                                break;
+                        }
+                    }
+                } catch (err) {
+                    console.error('轮询失败:', err);
+                }
+            }, 2000);
+        }
+
+        function closeModal() {
+            if (currentModal) {
+                currentModal.classList.remove('show');
+                document.getElementById('overlay').classList.remove('show');
+                if (pollTimer) {
+                    clearInterval(pollTimer);
+                    pollTimer = null;
+                }
+                if (countdownTimer) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                }
+                currentModal = null;
+                currentQrCode = null;
+            }
+        }
+
+        wechatBtn.addEventListener('click', () => openModal(wechatModal));
+
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', closeModal);
+        });
+
+        document.getElementById('overlay').addEventListener('click', closeModal);
+    </script>
+</body>
+</html>
+    

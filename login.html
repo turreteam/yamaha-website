@@ -816,23 +816,33 @@
             qrContainer.innerHTML = '<div class="qr-loading">加载中...</div>';
 
             try {
-                // 生成网址二维码
-                const websiteUrl = 'https://turreteam.github.io/yamaha-website/index.html';
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(websiteUrl)}`;
-                qrContainer.innerHTML = `<img src="${qrUrl}" alt="二维码" class="qr-img">`;
+                // 第一步：请求生成二维码
+                const generateResponse = await fetch(`${API_BASE}/auth/qrcode/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const generateData = await generateResponse.json();
 
-                // 模拟扫码成功，直接跳转
-                setTimeout(() => {
-                    closeModal();
-                    showSuccessPopup('登录成功', '即将跳转到首页...');
-                    setTimeout(() => {
-                        window.location.href = websiteUrl;
-                    }, 1500);
-                }, 2000);
+                if (!generateData.success) {
+                    qrContainer.innerHTML = '<div class="qr-error">生成失败</div>';
+                    return;
+                }
+                currentQrCode = generateData.code;
 
+                // 第二步：获取小程序码图片
+                const imageResponse = await fetch(`${API_BASE}/auth/qrcode/image?code=${generateData.code}`);
+                const imageData = await imageResponse.json();
+
+                if (imageData.success && imageData.image) {
+                    qrContainer.innerHTML = `<img src="${imageData.image}" alt="小程序码" class="qr-img">`;
+                    // 开始轮询
+                    startPolling(generateData.code, generateData.expiresAt);
+                } else {
+                    qrContainer.innerHTML = '<div class="qr-error">获取小程序码失败<br><small>请检查AppID配置</small></div>';
+                }
             } catch (err) {
                 console.error('生成二维码失败:', err);
-                qrContainer.innerHTML = '<div class="qr-error">生成失败</div>';
+                qrContainer.innerHTML = '<div class="qr-error">服务未启动<br><small>请启动后端服务</small></div>';
             }
         }
 
